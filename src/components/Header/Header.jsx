@@ -1,27 +1,24 @@
-import { NavLink } from 'react-router-dom';
-import styles from './Header.module.css';
+import {
+  HeaderWrap,
+  HeaderList,
+  HeaderListItem,
+  HeaderListItemNav,
+} from './Header.styled';
 
 const Header = () => {
   return (
-    <div className={styles.header}>
-      <ul className={styles.headerList}>
-        <NavLink
-          className={styles.headerList__item}
-          activeClassName={styles.headerList__activItem}
-          exact
-          to={`/`}
-        >
-          Home
-        </NavLink>
-        <NavLink
-          className={styles.headerList__item}
-          activeClassName={styles.headerList__activItem}
-          to={`/movie`}
-        >
-          Movies
-        </NavLink>
-      </ul>
-    </div>
+    <HeaderWrap>
+      <HeaderList>
+        <HeaderListItem>
+          <HeaderListItemNav exact to={`/`}>
+            Home
+          </HeaderListItemNav>
+        </HeaderListItem>
+        <HeaderListItem>
+          <HeaderListItemNav to={`/movie`}>Movies</HeaderListItemNav>
+        </HeaderListItem>
+      </HeaderList>
+    </HeaderWrap>
   );
 };
 

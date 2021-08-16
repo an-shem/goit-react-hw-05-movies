@@ -1,135 +1,138 @@
-import { Component } from 'react';
-import { Link, Route, Switch } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import {
+  Link,
+  Route,
+  Switch,
+  useLocation,
+  useRouteMatch,
+  useHistory,
+} from 'react-router-dom';
 import Cast from '../../components/Cast';
 import Reviews from '../../components/Reviews';
 
 import movieApi from '../../services/movieApi';
-import styles from './MovieDetailsPage.module.css';
+import {
+  MoviePage,
+  Btn,
+  AboutFilm,
+  PosterWrap,
+  Poster,
+  Inform,
+  Titel,
+  InformItem,
+  InformItemTitel,
+  AdditionalInformation,
+  AdditionalInformationTitel,
+  AdditionalInformationItem,
+} from './MovieDetailsPage.styled';
 import defaulImg from '../../images/unnamed.png';
 
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w300';
 
-class MovieDetailsPage extends Component {
-  state = {
-    movie: null,
-    pathname: this.props.location.state.from.pathname,
-    location: this.props.location,
-  };
+export default function MovieDetailsPage() {
+  const [movie, setMovie] = useState(null);
+  const { state } = useLocation();
+  const {
+    params: { movieID },
+    path,
+    url,
+  } = useRouteMatch();
+  const history = useHistory();
 
-  componentDidMount() {
-    const movieId = +this.props.match.params.movieID;
+  useEffect(() => {
+    const movieId = Number(movieID);
     movieApi.fetchMovie(movieId).then(movie => {
-      this.setState({ movie });
+      setMovie(movie);
     });
-  }
+  }, [movieID]);
 
-  handleGoBack = () => {
-    const { state } = this.props.location;
+  const handleGoBack = () => {
     if (state) {
-      this.props.history.push({
+      history.push({
         pathname: state.from.pathname,
         search: state.from.search,
       });
-
       return;
     }
-
-    this.props.history.push({
-      pathname: '/',
-    });
+    history.push('/');
   };
 
-  render() {
-    if (!this.state.movie) return null;
+  if (!movie) return null;
 
-    const {
-      id,
-      genres,
-      original_title: title,
-      poster_path: imgUrl,
-      overview,
-      vote_average,
-      release_date,
-    } = this.state.movie;
+  const {
+    id,
+    genres,
+    original_title: title,
+    poster_path: imgUrl,
+    overview,
+    vote_average,
+    release_date,
+  } = movie;
 
-    const ganresMovie = genres.map(item => item.name).join(' ');
-    const path = this.props.match.url;
-    const fullImageUrl = `${IMAGE_URL}${imgUrl}`;
-    const imageUrl = imgUrl ? fullImageUrl : defaulImg;
+  const ganresMovie = genres.map(item => item.name).join(' ');
+  const fullImageUrl = `${IMAGE_URL}${imgUrl}`;
+  const imageUrl = imgUrl ? fullImageUrl : defaulImg;
 
-    return (
-      <>
-        <div className={styles.moviePage}>
-          <button
-            type="button"
-            onClick={this.handleGoBack}
-            className={styles.btn}
-          >
-            {'<- Go beck'}
-          </button>
-          <div className={styles.aboutFilm}>
-            <div className={styles.posterWrap}>
-              <img src={imageUrl} alt="poster" className={styles.poster} />
-            </div>
-            <div className={styles.inform}>
-              <h2 className={styles.titel}>
-                {`${title}  (${Number.parseInt(release_date)})`}
-              </h2>
-              <p className={styles.informItem}>
-                User Score: {vote_average * 10}%
-              </p>
-              <h3 className={styles.informItem}>Overview</h3>
-              <p className={styles.informItem}>{overview}</p>
-              <h3 className={styles.informItem}>Genres</h3>
-              <p className={styles.informItem}>{ganresMovie}</p>
-            </div>
-          </div>
-        </div>
+  return (
+    <>
+      <MoviePage>
+        <Btn type="button" onClick={handleGoBack}>
+          {'<- Go beck'}
+        </Btn>
+        <AboutFilm>
+          <PosterWrap>
+            <Poster src={imageUrl} alt="poster" />
+          </PosterWrap>
+          <Inform>
+            <Titel>{`${title}  (${Number.parseInt(release_date)})`}</Titel>
+            <InformItem>User Score: {vote_average * 10}%</InformItem>
+            <InformItemTitel>Overview</InformItemTitel>
+            <InformItem>{overview}</InformItem>
+            <InformItemTitel>Genres</InformItemTitel>
+            <InformItem>{ganresMovie}</InformItem>
+          </Inform>
+        </AboutFilm>
+      </MoviePage>
 
-        <div className={styles.additionalInformation}>
-          <h3 className={styles.additionalInformationTitel}>
-            Additional information
-          </h3>
-          <ul>
-            <li className={styles.additionalInformationItem}>
-              <Link
-                to={{
-                  pathname: `${path}/cast`,
-                  state: {
-                    from: this.state.location.state.from,
-                  },
-                }}
-              >
-                Cast
-              </Link>
-            </li>
-            <li className={styles.additionalInformationItem}>
-              <Link
-                to={{
-                  pathname: `${path}/reviews`,
-                  state: {
-                    from: this.state.location.state.from,
-                  },
-                }}
-              >
-                Reviews
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <Switch>
-          <Route
-            path={`${this.props.match.path}/cast`}
-            render={props => <Cast {...props} id={id} />}
-          />
-          <Route
-            path={`${this.props.match.path}/reviews`}
-            render={props => <Reviews {...props} id={id} />}
-          />
-        </Switch>
-      </>
-    );
-  }
+      <AdditionalInformation>
+        <AdditionalInformationTitel>
+          Additional information
+        </AdditionalInformationTitel>
+        <ul>
+          <AdditionalInformationItem>
+            <Link
+              to={{
+                pathname: `${url}/cast`,
+                state: {
+                  from: state.from,
+                },
+              }}
+            >
+              Cast
+            </Link>
+          </AdditionalInformationItem>
+          <AdditionalInformationItem>
+            <Link
+              to={{
+                pathname: `${url}/reviews`,
+                state: {
+                  from: state.from,
+                },
+              }}
+            >
+              Reviews
+            </Link>
+          </AdditionalInformationItem>
+        </ul>
+      </AdditionalInformation>
+      <Switch>
+        <Route path={`${path}/cast`}>
+          <Cast id={id} />
+        </Route>
+        <Route path={`${path}/reviews`}>
+          <Reviews id={id} />
+        </Route>
+      </Switch>
+    </>
+  );
 }
-
-export default MovieDetailsPage;

@@ -1,30 +1,31 @@
-import { Component } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
-import Loading from '../Loading';
+
+import Loading from '../../components/Loading';
+import {
+  TitelError,
+  List,
+  ListItem,
+  ImgWrapp,
+  AuthorImg,
+  Text,
+} from './Cast.styled';
+
 import movieApi from '../../services/movieApi.js';
-import styles from './Cast.module.css';
 import defaulImg from '../../images/unnamed.png';
 
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w154';
 
-class Cast extends Component {
-  state = {
-    dataCast: null,
-    isLoading: false,
-    showCast: false,
-    showNotFound: false,
-    timerId: null,
-  };
+export default function Cast({ id }) {
+  const [dataCast, setDataCast] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showNotFound, setShowNotFound] = useState(false);
 
-  componentDidMount() {
-    const timerId = setTimeout(
-      () => this.setState({ showNotFound: true }),
-      1000,
-    );
-    this.setState({ isLoading: true, timerId });
+  useEffect(() => {
+    setIsLoading(true);
 
     movieApi
-      .fetchCast(this.props.id)
+      .fetchCast(id)
       .then(({ cast }) =>
         cast.map(item => ({
           name: item.name,
@@ -34,56 +35,46 @@ class Cast extends Component {
       )
       .then(arrayData => {
         if (arrayData.length > 0) {
-          this.setState({
-            dataCast: arrayData,
-            showCast: true,
-          });
+          setDataCast(arrayData);
+        } else {
+          setShowNotFound(true);
         }
       })
       .catch(error => console.log(error))
-      .finally(this.setState({ isLoading: false }));
-  }
+      .finally(setIsLoading(false));
+  }, [id]);
 
-  componentWillUnmount() {
-    clearTimeout(this.state.timerId);
-  }
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 400,
+      behavior: 'smooth',
+    });
+  }, [dataCast, showNotFound]);
 
-  render() {
-    const { dataCast, isLoading, showCast, showNotFound } = this.state;
-
-    return (
-      <>
-        {isLoading && <Loading />}
-        {!isLoading && showCast && (
-          <ul className={styles.list}>
-            {dataCast.map(({ name, character, img }) => {
-              const authorImg = img ? `${IMAGE_URL}${img}` : defaulImg;
-              return (
-                <li className={styles.listItem} key={name}>
-                  <div className={styles.imgWrapp}>
-                    <img
-                      className={styles.authorImg}
-                      src={authorImg}
-                      alt="actor"
-                    />
-                  </div>
-                  <p>{name}</p>
-                  <p>Character: {character}</p>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        {!isLoading && !showCast && showNotFound && (
-          <h2 className={styles.titelError}>DATA NOT FOUND</h2>
-        )}
-      </>
-    );
-  }
+  return (
+    <>
+      {isLoading && <Loading />}
+      {!isLoading && dataCast && (
+        <List>
+          {dataCast.map(({ name, character, img }) => {
+            const authorImg = img ? `${IMAGE_URL}${img}` : defaulImg;
+            return (
+              <ListItem key={character + name}>
+                <ImgWrapp>
+                  <AuthorImg src={authorImg} alt="actor" />
+                </ImgWrapp>
+                <Text>{name}</Text>
+                <Text>Character: {character}</Text>
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
+      {!isLoading && showNotFound && <TitelError>DATA NOT FOUND</TitelError>}
+    </>
+  );
 }
 
 Cast.propTypes = {
-  id: PropTypes.number,
+  id: PropTypes.number.isRequired,
 };
-
-export default Cast;

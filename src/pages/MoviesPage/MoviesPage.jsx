@@ -1,79 +1,63 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 
 import MoviesList from '../../components/MoviesList';
 import movieApi from '../../services/movieApi.js';
-import styles from './MoviesPage.module.css';
+import {
+  MoviesPageWrap,
+  SearchForm,
+  SearchFormInput,
+  SearchFormButton,
+} from './MoviesPage.styled';
 
-class MoviesPage extends Component {
-  state = {
-    value: '',
-    searchMovies: null,
-  };
+export default function MoviesPage() {
+  const [searchMovies, setSearchMovies] = useState(null);
 
-  async componentDidMount() {
-    const searchNoParse = await this.props.location.search;
+  const history = useHistory();
+  const { search, pathname } = useLocation();
+
+  useEffect(() => {
+    const searchNoParse = search;
 
     if (!searchNoParse) return;
+    const searchParse = queryString.parse(searchNoParse);
+    const searchQuery = searchParse.query;
 
-    const search = queryString.parse(searchNoParse);
-
-    const searchQuery = search.query;
     movieApi
       .fetchSearchMovies(searchQuery)
-      .then(searchMovies => this.setState({ searchMovies }));
-  }
+      .then(searchMovies => setSearchMovies(searchMovies));
+  }, [search]);
 
-  componentDidUpdate(prevProps) {
-    if (this.props.location.search === prevProps.location.search) return;
-    this.setState({ searchMovies: null });
-  }
-
-  handleChange = ({ target }) => {
-    const { name, value } = target;
-    this.setState({ [name]: value });
-  };
-
-  handeleSubmit = e => {
+  const handeleSubmit = e => {
     e.preventDefault();
-    const { value } = this.state;
-    const processedValue = value.trim();
-    if (processedValue.length === 0) return;
-    movieApi
-      .fetchSearchMovies(value)
-      .then(searchMovies => this.setState({ searchMovies, value: '' }))
-      .then(
-        this.props.history.push({
-          pathname: this.props.location.pathname,
-          search: `query=${value}`,
-        }),
-      );
+    const searchValue = e.target.InputSearch.value;
+    const processedSearchValue = searchValue.trim();
+    if (processedSearchValue.length === 0) return;
+
+    history.push({
+      pathname: pathname,
+      search: `query=${searchValue}`,
+    });
+
+    e.target.InputSearch.value = '';
   };
 
-  render() {
-    const { value, searchMovies } = this.state;
+  return (
+    <MoviesPageWrap>
+      <SearchForm onSubmit={handeleSubmit}>
+        <SearchFormInput
+          type="text"
+          name="InputSearch"
+          autoComplete="off"
+          autoFocus
+        />
 
-    return (
-      <div className={styles.moviesPage}>
-        <form className={styles.searchForm} onSubmit={this.handeleSubmit}>
-          <input
-            className={styles.searchFormInput}
-            type="text"
-            name="value"
-            value={value}
-            autoComplete="off"
-            autoFocus
-            onChange={this.handleChange}
-          />
-
-          <button type="submit" className={styles.searchFormButton}>
-            <span className={styles.searchFormButtonLabel}>Search</span>
-          </button>
-        </form>
-        {searchMovies && <MoviesList movies={searchMovies} />}
-      </div>
-    );
-  }
+        <SearchFormButton type="submit">
+          <span>Search</span>
+        </SearchFormButton>
+      </SearchForm>
+      {searchMovies && <MoviesList movies={searchMovies} />}
+    </MoviesPageWrap>
+  );
 }
-
-export default MoviesPage;

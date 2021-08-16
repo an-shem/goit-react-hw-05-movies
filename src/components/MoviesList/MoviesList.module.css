@@ -1,9 +1,0 @@
-.list {
-  display: flex;
-  flex-direction: column;
-  /* list-style-type: disc; */
-}
-
-.link:not(:last-child) {
-  margin-bottom: 6px;
-}

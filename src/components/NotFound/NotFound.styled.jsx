@@ -1,4 +1,6 @@
-.titleError {
+import styled from '@emotion/styled';
+
+export const TitleError = styled.h1`
   width: 400px;
   margin: 200px auto;
   font-family: Montserrat;
@@ -8,4 +10,4 @@
   line-height: 1.3;
   letter-spacing: 0.03em;
   color: #5b5f5eda;
-}
+`;

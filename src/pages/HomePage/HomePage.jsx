@@ -1,29 +1,21 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import MoviesList from '../../components/MoviesList';
 import movieApi from '../../services/movieApi.js';
-import styles from './HomePage.module.css';
+import { ListWrap, Title } from './HomePage.styled';
 
-class HomePage extends Component {
-  state = {
-    trendingMovies: null,
-  };
+export default function HomePage() {
+  const [trendingMovies, setTrendingMovies] = useState(null);
 
-  async componentDidMount() {
-    await movieApi
+  useEffect(() => {
+    movieApi
       .fetchTrendingMovies()
-      .then(trendingMovies => this.setState({ trendingMovies }));
-  }
+      .then(trendingMovies => setTrendingMovies(trendingMovies));
+  }, []);
 
-  render() {
-    const { trendingMovies } = this.state;
-
-    return (
-      <div className={styles.listWrap}>
-        <h1 className={styles.title}>Trending today</h1>
-        {trendingMovies && <MoviesList movies={trendingMovies} />}
-      </div>
-    );
-  }
+  return (
+    <ListWrap>
+      <Title>Trending today</Title>
+      {trendingMovies && <MoviesList movies={trendingMovies} />}
+    </ListWrap>
+  );
 }
-
-export default HomePage;

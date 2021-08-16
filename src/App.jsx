@@ -7,13 +7,21 @@ import NotFound from './components/NotFound';
 
 const App = () => {
   return (
-    <div className="App">
+    <div>
       <Header />
       <Switch>
-        <Route path="/" exact component={HomePage} />
-        <Route path="/movie/:movieID" component={MovieDetailsPage} />
-        <Route path="/movie" component={MoviesPage} />
-        <Route component={NotFound} />
+        <Route path="/" exact>
+          <HomePage />
+        </Route>
+        <Route path="/movie/:movieID">
+          <MovieDetailsPage />
+        </Route>
+        <Route path="/movie">
+          <MoviesPage />
+        </Route>
+        <Route>
+          <NotFound />
+        </Route>
       </Switch>
     </div>
   );

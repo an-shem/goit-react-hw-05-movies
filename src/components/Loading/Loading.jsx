@@ -1,7 +1,12 @@
-import styles from './Loading.module.css';
+import Loader from 'react-loader-spinner';
+import { WrapperLoader } from './Loading.styled';
 
 const Loading = () => {
-  return <h1 className={styles.titelError}>Loading...</h1>;
+  return (
+    <WrapperLoader>
+      <Loader type="Circles" color="#c75353" height={100} width={100} />
+    </WrapperLoader>
+  );
 };
 
 export default Loading;

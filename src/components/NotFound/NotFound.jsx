@@ -1,7 +1,7 @@
-import styles from './NotFound.module.css';
+import { TitleError } from './NotFound.styled';
 
 const NotFound = () => {
-  return <h1 className={styles.titleError}>ERROR 404</h1>;
+  return <TitleError>ERROR 404</TitleError>;
 };
 
 export default NotFound;

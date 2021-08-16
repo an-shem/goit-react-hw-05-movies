@@ -1,13 +1,15 @@
-.moviesPage {
+import styled from '@emotion/styled';
+
+export const MoviesPageWrap = styled.div`
   padding-top: 20px;
   padding-left: 40px;
-}
+`;
 
-.searchForm {
+export const SearchForm = styled.form`
   margin-bottom: 40px;
-}
+`;
 
-.searchFormInput {
+export const SearchFormInput = styled.input`
   padding-left: 20px;
   width: 500px;
   height: 40px;
@@ -20,12 +22,13 @@
   color: #123128da;
   border-radius: 10px;
   border: 2px solid #646262;
-}
-.searchFormInput:focus {
-  border: 2px solid #c75353;
-}
 
-.searchFormButton {
+  &:focus {
+    border: 2px solid #c75353;
+  }
+`;
+
+export const SearchFormButton = styled.button`
   margin-left: 10px;
   width: 90px;
   height: 40px;
@@ -39,8 +42,9 @@
   border-radius: 10px;
   border: 2px solid #646262;
   cursor: pointer;
-}
-.searchFormButton:hover {
-  color: #c75353;
-  border: 2px solid #c75353;
-}
+
+  &:hover {
+    color: #c75353;
+    border: 2px solid #c75353;
+  }
+`;

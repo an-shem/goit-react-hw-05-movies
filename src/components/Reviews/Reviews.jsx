@@ -1,29 +1,20 @@
-import { Component } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import movieApi from '../../services/movieApi';
 import Loading from '../Loading';
 
-import styles from './Reviews.module.css';
+import { TitelError, List } from './Reviews.styled';
 
-class Reviews extends Component {
-  state = {
-    dataReviews: null,
-    isLoading: false,
-    showReviews: false,
-    showNotFound: false,
-    timerId: null,
-  };
+export default function Reviews({ id }) {
+  const [dataReviews, setDataReviews] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showNotFound, setShowNotFound] = useState(false);
 
-  componentDidMount() {
-    const timerId = setTimeout(
-      () => this.setState({ showNotFound: true }),
-      1000,
-    );
-
-    this.setState({ isLoading: true, timerId });
+  useEffect(() => {
+    setIsLoading(true);
 
     movieApi
-      .fetchReviews(this.props.id)
+      .fetchReviews(id)
       .then(({ results }) =>
         results.map(result => ({
           author: result.author,
@@ -33,49 +24,42 @@ class Reviews extends Component {
       )
       .then(arrayData => {
         if (arrayData.length > 0) {
-          this.setState({
-            dataReviews: arrayData,
-            showReviews: true,
-          });
+          setDataReviews(arrayData);
+        } else {
+          setShowNotFound(true);
         }
       })
       .catch(error => console.log(error))
-      .finally(this.setState({ isLoading: false }));
-  }
+      .finally(setIsLoading(false));
+  }, [id]);
 
-  componentWillUnmount() {
-    clearTimeout(this.state.timerId);
-  }
+  useLayoutEffect(() => {
+    window.scrollTo({
+      top: 400,
+      behavior: 'smooth',
+    });
+  }, [dataReviews, showNotFound]);
 
-  render() {
-    const { dataReviews, isLoading, showReviews, showNotFound } = this.state;
-    const ttt = (
-      <h2 className={styles.titelError}>
-        We don't have any reviews for this movie
-      </h2>
-    );
-
-    return (
-      <>
-        {!isLoading && showReviews && (
-          <ul className={styles.list}>
-            {dataReviews.map(({ author, content, id }) => (
-              <li key={id}>
-                <h3>Author: {author}</h3>
-                <p>{content}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-        {isLoading && <Loading />}
-        {!isLoading && !showReviews && showNotFound && ttt}
-      </>
-    );
-  }
+  return (
+    <>
+      {!isLoading && dataReviews && (
+        <List>
+          {dataReviews.map(({ author, content, id }) => (
+            <li key={id}>
+              <h3>Author: {author}</h3>
+              <p>{content}</p>
+            </li>
+          ))}
+        </List>
+      )}
+      {isLoading && <Loading />}
+      {!isLoading && showNotFound && (
+        <TitelError>We don't have any reviews for this movie</TitelError>
+      )}
+    </>
+  );
 }
 
 Reviews.propTypes = {
   id: PropTypes.number,
 };
-
-export default Reviews;
