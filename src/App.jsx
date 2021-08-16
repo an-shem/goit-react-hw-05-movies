@@ -1,3 +1,5 @@
+import { Toaster } from 'react-hot-toast';
+
 import { Route, Switch } from 'react-router-dom';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
@@ -23,6 +25,15 @@ const App = () => {
           <NotFound />
         </Route>
       </Switch>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+        }}
+      />
     </div>
   );
 };

@@ -1,3 +1,5 @@
+import toast from 'react-hot-toast';
+
 import { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import queryString from 'query-string';
@@ -24,9 +26,12 @@ export default function MoviesPage() {
     const searchParse = queryString.parse(searchNoParse);
     const searchQuery = searchParse.query;
 
-    movieApi
-      .fetchSearchMovies(searchQuery)
-      .then(searchMovies => setSearchMovies(searchMovies));
+    movieApi.fetchSearchMovies(searchQuery).then(searchMovies => {
+      if (searchMovies.length === 0) {
+        toast.error('Nothing found');
+      }
+      setSearchMovies(searchMovies);
+    });
   }, [search]);
 
   const handeleSubmit = e => {
