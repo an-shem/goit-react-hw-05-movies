@@ -103,9 +103,11 @@ export default function MovieDetailsPage() {
             <Link
               to={{
                 pathname: `${url}/cast`,
-                state: {
-                  from: state.from,
-                },
+                state: state
+                  ? {
+                      from: state.from,
+                    }
+                  : null,
               }}
             >
               Cast
@@ -115,9 +117,11 @@ export default function MovieDetailsPage() {
             <Link
               to={{
                 pathname: `${url}/reviews`,
-                state: {
-                  from: state.from,
-                },
+                state: state
+                  ? {
+                      from: state.from,
+                    }
+                  : null,
               }}
             >
               Reviews
